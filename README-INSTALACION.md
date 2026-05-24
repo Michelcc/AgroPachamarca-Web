@@ -1,12 +1,19 @@
-# Agro Admin Panel — Instalación en InfinityFree
+# Agro Admin Panel — Instalación
 
-Guía paso a paso para desplegar el panel web PHP + API REST con Supabase.
+Guía para desplegar el panel web PHP + API REST con Supabase.
+
+| Plataforma | Guía |
+|------------|------|
+| **FL0** (recomendado, desde GitHub) | [README-FL0.md](./README-FL0.md) |
+| **InfinityFree** (FTP / PHP clásico) | Esta guía, sección InfinityFree abajo |
 
 ## Requisitos
-
-- Cuenta en [InfinityFree](https://www.infinityfree.com/)
 - Proyecto [Supabase](https://supabase.com/) con las tablas de la app móvil
 - SQL del panel: `public_html/sql/schema.sql` (ejecutar en el SQL Editor de Supabase)
+
+## InfinityFree
+
+- Cuenta en [InfinityFree](https://www.infinityfree.com/)
 
 ## 1. Preparar Supabase
 
@@ -42,10 +49,13 @@ htdocs/
   sql/          (opcional, no público si .htaccess bloquea)
 ```
 
-## 4. Configurar `config.php`
+## 4. Configurar credenciales
 
-1. En el servidor, copia `config.example.php` como `config.php` (o edita el `config.php` subido).
-2. Rellena:
+**InfinityFree:** copia `config.example.php` como `config.local.php` en el servidor.
+
+**FL0:** usa variables de entorno (ver [README-FL0.md](./README-FL0.md)).
+
+Contenido de `config.local.php`:
 
 ```php
 define('SUPABASE_URL', 'https://xxxxx.supabase.co');

@@ -1,5 +1,5 @@
-# Credenciales locales (copiar desde config.example.php)
-public_html/config.php
+# Credenciales locales opcionales (InfinityFree / desarrollo)
+public_html/config.local.php
 
 # Imágenes subidas por usuarios
 public_html/assets/uploads/*

@@ -1,7 +1,8 @@
 <?php
 /**
- * Copia este archivo como config.php y rellena tus credenciales Supabase.
- * NO subas config.php a repositorios públicos.
+ * Copia este archivo como config.local.php (InfinityFree / local).
+ * En FL0 no hace falta: usa variables de entorno (ver README-FL0.md).
+ * NO subas config.local.php a Git.
  */
 
 define('SUPABASE_URL', 'https://midominio.supabase.co');
