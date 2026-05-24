@@ -32,6 +32,8 @@ Ejecuta en el **SQL Editor** de Supabase, en este orden:
 
 Si antes subiste el módulo fiscal por error, ejecuta también `web-admin/sql/schema-drop-modulo-fiscal.sql`.
 
+Si usuarios de la app aparecen en **Authentication** pero no en el panel, ejecuta `sql/sync-profiles-from-auth.sql` y luego `sql/trigger-profile-on-signup.sql`.
+
 ## Primer administrador
 
 Tras el deploy, visita una sola vez:
