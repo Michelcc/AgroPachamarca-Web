@@ -1,0 +1,12 @@
+# Credenciales locales (copiar desde config.example.php)
+public_html/config.php
+
+# Imágenes subidas por usuarios
+public_html/assets/uploads/*
+!public_html/assets/uploads/.gitkeep
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
