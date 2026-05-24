@@ -94,78 +94,6 @@ create table if not exists public.registros_gps (
 create index if not exists idx_registros_gps_user on public.registros_gps (user_id, created_at desc);
 create index if not exists idx_registros_gps_fecha on public.registros_gps (created_at desc);
 
--- ── MÓDULO CARPETAS FISCALES ──
-create table if not exists public.fiscalias (
-  id uuid primary key default gen_random_uuid(),
-  nombre text not null unique,
-  activo boolean not null default true,
-  created_at timestamptz not null default now()
-);
-
-create table if not exists public.despachos (
-  id uuid primary key default gen_random_uuid(),
-  fiscalia_id uuid not null references public.fiscalias (id) on delete cascade,
-  nombre text not null,
-  activo boolean not null default true,
-  created_at timestamptz not null default now(),
-  unique (fiscalia_id, nombre)
-);
-
-create table if not exists public.carpetas (
-  id uuid primary key default gen_random_uuid(),
-  numero text not null unique,
-  imputado text not null,
-  agraviado text,
-  delito text not null,
-  fiscalia_id uuid references public.fiscalias (id),
-  despacho_id uuid references public.despachos (id),
-  fiscal_responsable text,
-  folios int default 0,
-  correo text,
-  estado text not null default 'Archivo Central'
-    check (estado in ('Archivo Central', 'Prestada', 'Devuelta', 'Desarchivada')),
-  fecha_registro timestamptz not null default now(),
-  created_at timestamptz not null default now()
-);
-
-create table if not exists public.prestamos (
-  id uuid primary key default gen_random_uuid(),
-  carpeta_id uuid not null references public.carpetas (id) on delete cascade,
-  fiscalia_solicitante text not null,
-  solicitante text not null,
-  fecha_prestamo timestamptz not null default now(),
-  fecha_devolucion timestamptz,
-  motivo text,
-  activo boolean not null default true,
-  recordatorio_enviado boolean not null default false,
-  created_at timestamptz not null default now()
-);
-
-create table if not exists public.historial_movimientos (
-  id uuid primary key default gen_random_uuid(),
-  carpeta_id uuid not null references public.carpetas (id) on delete cascade,
-  tipo text not null,
-  descripcion text not null,
-  usuario_id uuid references public.usuarios (id) on delete set null,
-  fecha timestamptz not null default now()
-);
-
-create table if not exists public.alertas_prestamos (
-  id uuid primary key default gen_random_uuid(),
-  prestamo_id uuid not null references public.prestamos (id) on delete cascade,
-  dias_transcurridos int not null,
-  nivel text not null,
-  correo_simulado boolean not null default false,
-  created_at timestamptz not null default now()
-);
-
--- Datos demo fiscalias
-insert into public.fiscalias (nombre) values
-  ('Fiscalía Provincial Penal'),
-  ('Fiscalía Especializada'),
-  ('Fiscalía de Flagrancia')
-on conflict (nombre) do nothing;
-
 -- ── RPC: listar registros GPS desde tablas de campo ──
 create or replace function public.list_registros_campo_gps(p_limit int default 200)
 returns table (
@@ -201,12 +129,6 @@ alter table public.usuarios enable row level security;
 alter table public.recomendaciones_cultivo enable row level security;
 alter table public.alertas_climaticas enable row level security;
 alter table public.registros_gps enable row level security;
-alter table public.fiscalias enable row level security;
-alter table public.despachos enable row level security;
-alter table public.carpetas enable row level security;
-alter table public.prestamos enable row level security;
-alter table public.historial_movimientos enable row level security;
-alter table public.alertas_prestamos enable row level security;
 
 -- Lectura pública para app móvil (anon key)
 drop policy if exists "recomendaciones_read" on public.recomendaciones_cultivo;

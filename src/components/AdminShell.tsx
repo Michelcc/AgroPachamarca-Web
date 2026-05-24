@@ -9,8 +9,7 @@ const MENU = [
   { href: "/admin/recomendaciones", label: "Recomendaciones", icon: "🌾" },
   { href: "/admin/alertas", label: "Alertas clima", icon: "☁️" },
   { href: "/admin/diagnosticos", label: "Diagnósticos IA", icon: "🔬" },
-  { href: "/admin/registros-gps", label: "Registros GPS", icon: "📍" },
-  { href: "/admin/carpetas", label: "Carpetas fiscales", icon: "📁" }
+  { href: "/admin/registros-gps", label: "Registros GPS", icon: "📍" }
 ];
 
 export function AdminShell({

@@ -20,7 +20,7 @@ Copia `.env.example` a `.env.local` en desarrollo, o configúralas en Vercel →
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave anónima (app móvil + Auth) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role (panel admin, bypass RLS) |
 | `SESSION_SECRET` | Clave JWT sesión panel (mín. 16 caracteres) |
-| `CRON_SECRET` | Clave para `/setup` y cron de préstamos |
+| `CRON_SECRET` | Clave para `/setup` (crear admin inicial) |
 
 ## SQL en Supabase (orden)
 
@@ -28,7 +28,9 @@ Ejecuta en el **SQL Editor** de Supabase, en este orden:
 
 1. `android/supabase/schema.sql` — esquema base app móvil  
 2. `android/supabase/schema-tablas-campo.sql` — tablas de campo dinámicas  
-3. `web-admin/sql/schema.sql` — extensiones panel (usuarios, carpetas, alertas, etc.)
+3. `web-admin/sql/schema.sql` — extensiones panel (usuarios, alertas, GPS, etc.)
+
+Si antes subiste el módulo fiscal por error, ejecuta también `web-admin/sql/schema-drop-modulo-fiscal.sql`.
 
 ## Primer administrador
 
@@ -60,12 +62,6 @@ Abre [http://localhost:3000](http://localhost:3000).
 4. Añade las variables de entorno de la tabla anterior.  
 5. Deploy.
 
-El archivo `vercel.json` define el cron diario:
-
-- `GET /api/cron/alertas-prestamos` — alertas de préstamos vencidos (8:00 UTC)
-
-Autenticación del cron: header `Authorization: Bearer CRON_SECRET` o query `?key=CRON_SECRET`.
-
 ## API móvil
 
 | Método | Ruta | Auth |
@@ -79,7 +75,6 @@ Autenticación del cron: header `Authorization: Bearer CRON_SECRET` o query `?ke
 | POST | `/api/diagnostico` | Bearer |
 | GET/PUT | `/api/perfil` | Bearer |
 | POST | `/api/registros_gps` | Bearer |
-| GET/POST | `/api/carpetas` | POST acciones préstamo |
 
 ## Panel admin
 
