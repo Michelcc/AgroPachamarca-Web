@@ -1,10 +1,12 @@
 import bcrypt from "bcryptjs";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
-type Props = { searchParams: Promise<{ key?: string; password?: string }> };
+type Props = {
+  searchParams: Promise<{ key?: string; email?: string; password?: string; nombre?: string }>;
+};
 
 export default async function SetupPage({ searchParams }: Props) {
-  const { key, password } = await searchParams;
+  const { key, email: emailParam, password, nombre: nombreParam } = await searchParams;
   const cronSecret = process.env.CRON_SECRET ?? "";
 
   if (!key || key !== cronSecret) {
@@ -23,7 +25,8 @@ export default async function SetupPage({ searchParams }: Props) {
   const plain = password ?? "admin123";
   const hash = await bcrypt.hash(plain, 10);
   const db = getSupabaseAdmin();
-  const email = "admin@agro.local";
+  const email = (emailParam ?? "admin@agro.local").trim().toLowerCase();
+  const nombre = (nombreParam ?? "Administrador").trim() || "Administrador";
 
   const { data: existing } = await db
     .from("usuarios")
@@ -35,14 +38,14 @@ export default async function SetupPage({ searchParams }: Props) {
   if (existing) {
     const { error } = await db
       .from("usuarios")
-      .update({ password_hash: hash, rol: "admin", activo: true })
+      .update({ nombre, password_hash: hash, rol: "admin", activo: true })
       .eq("id", existing.id);
     message = error
       ? `Error: ${error.message}`
       : `Admin actualizado. Email: ${email} Password: ${plain}`;
   } else {
     const { error } = await db.from("usuarios").insert({
-      nombre: "Administrador",
+      nombre,
       email,
       password_hash: hash,
       rol: "admin",

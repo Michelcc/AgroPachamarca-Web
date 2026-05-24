@@ -37,10 +37,12 @@ Si antes subiste el módulo fiscal por error, ejecuta también `web-admin/sql/sc
 Tras el deploy, visita una sola vez:
 
 ```
-https://tu-dominio.vercel.app/setup?key=TU_CRON_SECRET&password=TuClaveSegura
+https://tu-dominio.vercel.app/setup?key=TU_CRON_SECRET&email=maycolccq@gmail.com&password=maycol123&nombre=Maycol
 ```
 
-Crea/actualiza `admin@agro.local`. Luego inicia sesión en `/login`.
+O ejecuta `sql/seed-admin.sql` en Supabase (mismo usuario).
+
+Crea/actualiza el admin indicado. Luego inicia sesión en `/login`.
 
 ## Desarrollo local
 
