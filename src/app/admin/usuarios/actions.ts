@@ -54,3 +54,42 @@ export async function deleteUsuario(formData: FormData) {
   revalidatePath("/admin/usuarios");
   redirect("/admin/usuarios?ok=deleted");
 }
+
+/** Usuario de la app móvil: Supabase Auth + tabla profiles */
+export async function createUsuarioMovil(formData: FormData) {
+  await guard();
+  const db = getSupabaseAdmin();
+  const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+  const nombre = String(formData.get("nombre") ?? "").trim();
+  const username = String(formData.get("username") ?? "").trim();
+
+  if (!email || !password || !nombre || !username) {
+    throw new Error("Email, contraseña, nombre y username son requeridos.");
+  }
+
+  const { data: auth, error: authErr } = await db.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { nombre, username }
+  });
+
+  if (authErr) throw new Error(authErr.message);
+
+  const userId = auth.user?.id;
+  if (!userId) throw new Error("No se obtuvo el id del usuario.");
+
+  const { error: profileErr } = await db.from("profiles").upsert({
+    id: userId,
+    nombre,
+    username,
+    rol: "agricultor",
+    activo: true
+  });
+
+  if (profileErr) throw new Error(profileErr.message);
+
+  revalidatePath("/admin/usuarios");
+  redirect("/admin/usuarios?ok=mobile_created");
+}
