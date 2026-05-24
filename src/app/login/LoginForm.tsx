@@ -19,7 +19,13 @@ export function LoginForm() {
         headers: { Accept: "application/json" },
         body: fd
       });
-      const data = await res.json();
+      let data: { ok?: boolean; error?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        setError(`Error del servidor (${res.status}). Revisa variables en Vercel.`);
+        return;
+      }
       if (!res.ok || !data.ok) {
         setError(data.error ?? "Credenciales incorrectas.");
         return;
@@ -27,7 +33,7 @@ export function LoginForm() {
       router.push("/dashboard");
       router.refresh();
     } catch {
-      setError("Error de conexión.");
+      setError("Error de conexión. Comprueba tu red o el deploy en Vercel.");
     } finally {
       setLoading(false);
     }
