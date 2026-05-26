@@ -1,6 +1,13 @@
 import { AdminShell } from "@/components/AdminShell";
 import { ConfirmDeleteButton } from "@/components/ConfirmDeleteButton";
-import { Dialog, DialogTrigger } from "@/components/DialogForm";
+import {
+  DialogTrigger,
+  EnterpriseDialog,
+  ModalActions,
+  ModalBody,
+  ModalFooter
+} from "@/components/EnterpriseDialog";
+import { UsuarioMovilFormFields, UsuarioPanelFormFields } from "@/components/forms/UsuarioForm";
 import { getAdminPageUser } from "@/lib/admin-page";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import {
@@ -54,20 +61,17 @@ export default async function UsuariosPage({
       ) : null}
       {errProfiles ? (
         <div className="alert alert-warning">
-          App móvil: {errProfiles.message}. ¿Ejecutaste{" "}
-          <code>web-admin/sql/schema.sql</code> en Supabase?
+          App móvil: {errProfiles.message}. ¿Ejecutaste sql/schema.sql en Supabase?
         </div>
       ) : null}
 
       <div className="table-card mb-4">
-        <div className="d-flex justify-content-between align-items-start mb-3">
+        <div className="page-toolbar" style={{ marginBottom: 0, boxShadow: "none", border: "none", padding: "0 0 1rem" }}>
           <div>
-            <h2 className="h6 fw-bold mb-1">Usuarios panel (login web)</h2>
-            <p className="text-muted small mb-0">
-              Tabla <code>usuarios</code> — solo entran al panel admin en el navegador.
-            </p>
+            <h2>Usuarios panel (login web)</h2>
+            <p>Administradores con permisos de gestión</p>
           </div>
-          <DialogTrigger label="+ Usuario panel" dialogId="modal-create-user" />
+          <DialogTrigger label="+ Nuevo administrador" dialogId="modal-create-user" className="btn btn-agro" />
         </div>
         <table className="table">
           <thead>
@@ -91,7 +95,7 @@ export default async function UsuariosPage({
                 <td>{u.activo ? "✓" : "—"}</td>
                 <td>{u.ultimo_acceso ? String(u.ultimo_acceso).slice(0, 16) : "—"}</td>
                 <td className="text-nowrap">
-                  <DialogTrigger label="Editar" dialogId={`edit-user-${u.id}`} />
+                  <DialogTrigger label="Editar" dialogId={`edit-user-${u.id}`} className="btn btn-sm btn-outline-primary" />
                   {u.id !== user.id ? (
                     <form action={deleteUsuario} className="d-inline" style={{ marginLeft: 4 }}>
                       <input type="hidden" name="id" value={u.id} />
@@ -113,15 +117,12 @@ export default async function UsuariosPage({
       </div>
 
       <div className="table-card">
-        <div className="d-flex justify-content-between align-items-start mb-3">
+        <div className="page-toolbar" style={{ marginBottom: 0, boxShadow: "none", border: "none", padding: "0 0 1rem" }}>
           <div>
-            <h2 className="h6 fw-bold mb-1">Usuarios app móvil</h2>
-            <p className="text-muted small mb-0">
-              Tabla <code>profiles</code> + Supabase Auth — quienes se registran en la app
-              Android.
-            </p>
+            <h2>Usuarios app móvil</h2>
+            <p>Personal de campo registrado en la app</p>
           </div>
-          <DialogTrigger label="+ Usuario app" dialogId="modal-create-mobile" />
+          <DialogTrigger label="+ Usuario app" dialogId="modal-create-mobile" className="btn btn-agro btn-sm" />
         </div>
         <table className="table">
           <thead>
@@ -146,8 +147,7 @@ export default async function UsuariosPage({
             {(profiles ?? []).length === 0 && !errProfiles ? (
               <tr>
                 <td colSpan={5} className="text-muted">
-                  Nadie registrado en la app aún. Usa «+ Usuario app» o registro desde el
-                  celular.
+                  Nadie registrado en la app aún.
                 </td>
               </tr>
             ) : null}
@@ -155,110 +155,61 @@ export default async function UsuariosPage({
         </table>
       </div>
 
-      <Dialog id="modal-create-user" title="Nuevo usuario panel (web)">
+      <EnterpriseDialog
+        id="modal-create-user"
+        title="Crear Nuevo Usuario"
+        subtitle="Configura el perfil y los permisos del sistema."
+      >
         <form action={createUsuario}>
-          <div className="modal-body">
-            <input className="form-control mb-2" name="nombre" placeholder="Nombre" required />
-            <input
-              className="form-control mb-2"
-              name="email"
-              type="email"
-              placeholder="Email"
-              required
-            />
-            <input
-              className="form-control mb-2"
-              name="password"
-              type="password"
-              placeholder="Contraseña"
-              required
-            />
-            <select className="form-select mb-2" name="rol" defaultValue="operador">
-              <option value="admin">admin</option>
-              <option value="operador">operador</option>
-            </select>
-            <label className="form-check">
-              <input type="checkbox" name="activo" defaultChecked /> Activo
-            </label>
-          </div>
-          <div className="modal-footer">
-            <button type="submit" className="btn btn-agro">
-              Crear
-            </button>
-          </div>
+          <ModalBody>
+            <UsuarioPanelFormFields />
+          </ModalBody>
+          <ModalFooter>
+            <ModalActions dialogId="modal-create-user" submitLabel="Guardar Usuario" />
+          </ModalFooter>
         </form>
-      </Dialog>
+      </EnterpriseDialog>
 
-      <Dialog id="modal-create-mobile" title="Nuevo usuario app móvil">
+      <EnterpriseDialog
+        id="modal-create-mobile"
+        title="Nuevo usuario app móvil"
+        subtitle="Crea acceso para personal de campo en Android."
+      >
         <form action={createUsuarioMovil}>
-          <div className="modal-body">
-            <input className="form-control mb-2" name="nombre" placeholder="Nombre completo" required />
-            <input
-              className="form-control mb-2"
-              name="username"
-              placeholder="Username (login app)"
-              required
-            />
-            <input
-              className="form-control mb-2"
-              name="email"
-              type="email"
-              placeholder="Email"
-              required
-            />
-            <input
-              className="form-control mb-2"
-              name="password"
-              type="password"
-              placeholder="Contraseña"
-              required
-            />
-          </div>
-          <div className="modal-footer">
-            <button type="submit" className="btn btn-agro">
-              Crear en app
-            </button>
-          </div>
+          <ModalBody>
+            <UsuarioMovilFormFields />
+          </ModalBody>
+          <ModalFooter>
+            <ModalActions dialogId="modal-create-mobile" submitLabel="Crear en app" />
+          </ModalFooter>
         </form>
-      </Dialog>
+      </EnterpriseDialog>
 
       {(usuarios ?? []).map((u) => (
-        <Dialog key={u.id} id={`edit-user-${u.id}`} title="Editar usuario panel">
+        <EnterpriseDialog
+          key={u.id}
+          id={`edit-user-${u.id}`}
+          title="Editar usuario"
+          subtitle={u.email}
+        >
           <form action={updateUsuario}>
             <input type="hidden" name="id" value={u.id} />
-            <div className="modal-body">
-              <input className="form-control mb-2" name="nombre" defaultValue={u.nombre} required />
-              <input
-                className="form-control mb-2"
-                name="email"
-                type="email"
-                defaultValue={u.email}
-                required
+            <ModalBody>
+              <UsuarioPanelFormFields
+                isEdit
+                defaultValues={{
+                  nombre: u.nombre,
+                  email: u.email,
+                  rol: u.rol,
+                  activo: u.activo
+                }}
               />
-              <select className="form-select mb-2" name="rol" defaultValue={u.rol}>
-                {["admin", "operador", "agricultor"].map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-              <input
-                className="form-control mb-2"
-                name="password"
-                type="password"
-                placeholder="Nueva contraseña (opcional)"
-              />
-              <label className="form-check">
-                <input type="checkbox" name="activo" defaultChecked={u.activo} /> Activo
-              </label>
-            </div>
-            <div className="modal-footer">
-              <button type="submit" className="btn btn-agro">
-                Guardar
-              </button>
-            </div>
+            </ModalBody>
+            <ModalFooter>
+              <ModalActions dialogId={`edit-user-${u.id}`} submitLabel="Guardar cambios" />
+            </ModalFooter>
           </form>
-        </Dialog>
+        </EnterpriseDialog>
       ))}
     </AdminShell>
   );

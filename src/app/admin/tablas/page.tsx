@@ -1,6 +1,13 @@
 import { AdminShell } from "@/components/AdminShell";
 import { ConfirmDeleteButton } from "@/components/ConfirmDeleteButton";
-import { Dialog, DialogTrigger } from "@/components/DialogForm";
+import {
+  DialogTrigger,
+  EnterpriseDialog,
+  ModalActions,
+  ModalBody,
+  ModalFooter
+} from "@/components/EnterpriseDialog";
+import { TablaFormFields } from "@/components/forms/TablaForm";
 import { getAdminPageUser } from "@/lib/admin-page";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import {
@@ -19,17 +26,38 @@ export default async function TablasPage() {
     .order("orden")
     .order("codigo");
 
+  const activas = (tablas ?? []).filter((t) => t.activo).length;
+
   return (
     <AdminShell
       user={user}
       title="Tablas de datos"
       subtitle="Catálogo de esquemas de campo del sistema."
     >
-      <div className="d-flex justify-content-between mb-3">
-        <p className="text-muted mb-0">
-          Catálogo de tablas de campo para la app móvil ({(tablas ?? []).length} registros)
-        </p>
-        <DialogTrigger label="+ Nueva tabla" dialogId="modal-create-tabla" />
+      <div className="row g-3 mb-3">
+        <div className="col-md-4">
+          <div className="card stat-card p-3">
+            <div className="stat-label">Total tablas</div>
+            <div className="stat-value">{(tablas ?? []).length}</div>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="card stat-card p-3">
+            <div className="stat-label">Tablas activas</div>
+            <div className="stat-value">{activas}</div>
+            <div className="stat-trend">
+              {tablas?.length ? ((activas / tablas.length) * 100).toFixed(1) : 0}% del total
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="page-toolbar">
+        <div>
+          <h2>Gestión de tablas de datos</h2>
+          <p>Configura diccionarios visibles en la app móvil</p>
+        </div>
+        <DialogTrigger label="+ Nueva tabla" dialogId="modal-create-tabla" className="btn btn-agro" />
       </div>
 
       <div className="table-card">
@@ -83,7 +111,7 @@ export default async function TablasPage() {
                   </form>
                 </td>
                 <td className="text-nowrap">
-                  <DialogTrigger label="Editar" dialogId={`edit-tabla-${t.codigo}`} />
+                  <DialogTrigger label="Editar" dialogId={`edit-tabla-${t.codigo}`} className="btn btn-sm btn-outline-primary" />
                   <form action={deleteTabla} className="d-inline" style={{ marginLeft: 4 }}>
                     <input type="hidden" name="codigo" value={t.codigo} />
                     <ConfirmDeleteButton />
@@ -95,46 +123,48 @@ export default async function TablasPage() {
         </table>
       </div>
 
-      <Dialog id="modal-create-tabla" title="Nueva tabla">
+      <EnterpriseDialog
+        id="modal-create-tabla"
+        title="Nueva Tabla de Datos"
+        subtitle="Defina los parámetros básicos de la nueva estructura."
+      >
         <form action={createTabla}>
-          <div className="modal-body">
-            <input className="form-control mb-2" name="codigo" placeholder="codigo_tabla" required />
-            <input className="form-control mb-2" name="categoria" placeholder="Categoría" required />
-            <input className="form-control mb-2" name="nombre_display" placeholder="Nombre visible" required />
-            <input className="form-control mb-2" name="icono" placeholder="Icono" defaultValue="📋" />
-            <input className="form-control mb-2" name="orden" type="number" defaultValue={0} />
-            <label className="form-check">
-              <input type="checkbox" name="activo" defaultChecked /> Activo
-            </label>
-          </div>
-          <div className="modal-footer">
-            <button type="submit" className="btn btn-agro">
-              Crear
-            </button>
-          </div>
+          <ModalBody>
+            <TablaFormFields />
+          </ModalBody>
+          <ModalFooter>
+            <ModalActions dialogId="modal-create-tabla" submitLabel="Crear Tabla" />
+          </ModalFooter>
         </form>
-      </Dialog>
+      </EnterpriseDialog>
 
       {(tablas ?? []).map((t) => (
-        <Dialog key={t.codigo} id={`edit-tabla-${t.codigo}`} title={`Editar ${t.codigo}`}>
+        <EnterpriseDialog
+          key={t.codigo}
+          id={`edit-tabla-${t.codigo}`}
+          title="Editar tabla"
+          subtitle={t.codigo}
+        >
           <form action={updateTabla}>
             <input type="hidden" name="codigo" value={t.codigo} />
-            <div className="modal-body">
-              <input className="form-control mb-2" name="categoria" defaultValue={t.categoria} required />
-              <input className="form-control mb-2" name="nombre_display" defaultValue={t.nombre_display ?? ""} required />
-              <input className="form-control mb-2" name="icono" defaultValue={t.icono ?? "📋"} />
-              <input className="form-control mb-2" name="orden" type="number" defaultValue={t.orden ?? 0} />
-              <label className="form-check">
-                <input type="checkbox" name="activo" defaultChecked={t.activo} /> Activo
-              </label>
-            </div>
-            <div className="modal-footer">
-              <button type="submit" className="btn btn-agro">
-                Guardar
-              </button>
-            </div>
+            <ModalBody>
+              <TablaFormFields
+                isEdit
+                defaultValues={{
+                  codigo: t.codigo,
+                  categoria: t.categoria,
+                  nombre_display: t.nombre_display ?? "",
+                  icono: t.icono ?? "📋",
+                  orden: t.orden ?? 0,
+                  activo: t.activo
+                }}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <ModalActions dialogId={`edit-tabla-${t.codigo}`} submitLabel="Guardar tabla" />
+            </ModalFooter>
           </form>
-        </Dialog>
+        </EnterpriseDialog>
       ))}
     </AdminShell>
   );

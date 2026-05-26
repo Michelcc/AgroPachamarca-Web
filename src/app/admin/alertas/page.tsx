@@ -1,14 +1,21 @@
 import { AdminShell } from "@/components/AdminShell";
 import { ConfirmDeleteButton } from "@/components/ConfirmDeleteButton";
-import { Dialog, DialogTrigger } from "@/components/DialogForm";
+import {
+  DialogTrigger,
+  EnterpriseDialog,
+  ModalActions,
+  ModalBody,
+  ModalFooter
+} from "@/components/EnterpriseDialog";
+import { AlertaFormFields } from "@/components/forms/AlertaForm";
 import { MlAlertPredictorCard } from "@/components/MlAlertPredictorCard";
 import { getAdminPageUser } from "@/lib/admin-page";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { createAlerta, updateAlerta, toggleAlerta, deleteAlerta } from "./actions";
 
 const NIVELES: Record<string, string> = {
-  info: "Info",
-  advertencia: "Advertencia",
+  info: "Informativo",
+  advertencia: "Moderado",
   critico: "Crítico"
 };
 
@@ -33,9 +40,12 @@ export default async function AlertasPage() {
     >
       <MlAlertPredictorCard />
 
-      <div className="d-flex justify-content-between mb-3">
-        <p className="text-muted mb-0">Alertas globales manuales (panel → app móvil)</p>
-        <DialogTrigger label="+ Nueva alerta" dialogId="modal-create-alerta" />
+      <div className="page-toolbar">
+        <div>
+          <h2>Registro de alertas</h2>
+          <p>{(alertas ?? []).length} alertas · visibles en la app móvil</p>
+        </div>
+        <DialogTrigger label="+ Nueva alerta" dialogId="modal-create-alerta" className="btn btn-agro" />
       </div>
 
       <div className="table-card">
@@ -45,7 +55,7 @@ export default async function AlertasPage() {
               <th>Título</th>
               <th>Nivel</th>
               <th>Ubicación</th>
-              <th>Activo</th>
+              <th>Estado</th>
               <th>Fecha</th>
               <th></th>
             </tr>
@@ -82,7 +92,7 @@ export default async function AlertasPage() {
                 </td>
                 <td>{String(a.created_at).slice(0, 10)}</td>
                 <td>
-                  <DialogTrigger label="Editar" dialogId={`edit-alerta-${a.id}`} />
+                  <DialogTrigger label="Editar" dialogId={`edit-alerta-${a.id}`} className="btn btn-sm btn-outline-primary" />
                   <form action={deleteAlerta} className="d-inline" style={{ marginLeft: 4 }}>
                     <input type="hidden" name="id" value={a.id} />
                     <ConfirmDeleteButton />
@@ -94,71 +104,47 @@ export default async function AlertasPage() {
         </table>
       </div>
 
-      <Dialog id="modal-create-alerta" title="Nueva alerta">
+      <EnterpriseDialog
+        id="modal-create-alerta"
+        title="Nueva alerta climática"
+        subtitle="Publica un aviso para productores con nivel de riesgo y ubicación."
+      >
         <form action={createAlerta}>
-          <div className="modal-body">
-            <input className="form-control mb-2" name="titulo" placeholder="Título" required />
-            <textarea className="form-control mb-2" name="mensaje" rows={3} required />
-            <select className="form-select mb-2" name="nivel" defaultValue="info">
-              {Object.entries(NIVELES).map(([k, lbl]) => (
-                <option key={k} value={k}>
-                  {lbl}
-                </option>
-              ))}
-            </select>
-            <div className="row mb-2">
-              <div className="col">
-                <input className="form-control" name="lat" type="number" step="any" placeholder="Latitud" />
-              </div>
-              <div className="col">
-                <input className="form-control" name="lng" type="number" step="any" placeholder="Longitud" />
-              </div>
-            </div>
-            <label className="form-check">
-              <input type="checkbox" name="activo" defaultChecked /> Activo
-            </label>
-          </div>
-          <div className="modal-footer">
-            <button type="submit" className="btn btn-agro">
-              Crear
-            </button>
-          </div>
+          <ModalBody>
+            <AlertaFormFields />
+          </ModalBody>
+          <ModalFooter>
+            <ModalActions dialogId="modal-create-alerta" submitLabel="Publicar alerta" />
+          </ModalFooter>
         </form>
-      </Dialog>
+      </EnterpriseDialog>
 
       {(alertas ?? []).map((a) => (
-        <Dialog key={a.id} id={`edit-alerta-${a.id}`} title="Editar alerta">
+        <EnterpriseDialog
+          key={a.id}
+          id={`edit-alerta-${a.id}`}
+          title="Editar alerta"
+          subtitle={a.titulo}
+        >
           <form action={updateAlerta}>
             <input type="hidden" name="id" value={a.id} />
-            <div className="modal-body">
-              <input className="form-control mb-2" name="titulo" defaultValue={a.titulo} required />
-              <textarea className="form-control mb-2" name="mensaje" rows={3} defaultValue={a.mensaje} required />
-              <select className="form-select mb-2" name="nivel" defaultValue={a.nivel}>
-                {Object.entries(NIVELES).map(([k, lbl]) => (
-                  <option key={k} value={k}>
-                    {lbl}
-                  </option>
-                ))}
-              </select>
-              <div className="row mb-2">
-                <div className="col">
-                  <input className="form-control" name="lat" type="number" step="any" defaultValue={a.lat ?? ""} />
-                </div>
-                <div className="col">
-                  <input className="form-control" name="lng" type="number" step="any" defaultValue={a.lng ?? ""} />
-                </div>
-              </div>
-              <label className="form-check">
-                <input type="checkbox" name="activo" defaultChecked={a.activo} /> Activo
-              </label>
-            </div>
-            <div className="modal-footer">
-              <button type="submit" className="btn btn-agro">
-                Guardar
-              </button>
-            </div>
+            <ModalBody>
+              <AlertaFormFields
+                defaultValues={{
+                  titulo: a.titulo,
+                  mensaje: a.mensaje,
+                  nivel: a.nivel,
+                  lat: a.lat,
+                  lng: a.lng,
+                  activo: a.activo
+                }}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <ModalActions dialogId={`edit-alerta-${a.id}`} submitLabel="Guardar alerta" />
+            </ModalFooter>
           </form>
-        </Dialog>
+        </EnterpriseDialog>
       ))}
     </AdminShell>
   );

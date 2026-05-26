@@ -39,6 +39,13 @@ export default async function DiagnosticosPage({
       title="Diagnósticos IA"
       subtitle="Registro de análisis de plantas y tendencia de salud."
     >
+      <div className="page-toolbar">
+        <div>
+          <h2>Registro de diagnósticos</h2>
+          <p>{(diagnosticos ?? []).length} análisis en la vista actual</p>
+        </div>
+      </div>
+
       <form method="get" className="row g-2 mb-3 align-items-end">
         <div className="col-auto">
           <label className="form-label small">Filtrar por fecha</label>

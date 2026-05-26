@@ -89,6 +89,28 @@ a:hover {
   color: var(--agro-primary);
 }
 
+.btn-outline-agro {
+  background: #fff;
+  border: 1.5px solid var(--agro-primary);
+  color: var(--agro-primary);
+  font-weight: 600;
+}
+
+.btn-outline-agro:hover {
+  background: #f0f7f2;
+}
+
+.btn-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.btn-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .btn-outline-secondary {
   background: transparent;
   border-color: #ccc;
@@ -1083,6 +1105,348 @@ dialog.modal-dialog::backdrop {
 
 dialog.modal-dialog.modal-lg {
   max-width: 800px;
+}
+
+/* Enterprise modals (mockup) */
+dialog.modal-enterprise {
+  border: none;
+  border-radius: 18px;
+  padding: 0;
+  max-width: 520px;
+  width: calc(100% - 2rem);
+  box-shadow: 0 24px 64px rgba(11, 61, 28, 0.22);
+  background: transparent;
+}
+
+dialog.modal-enterprise-lg {
+  max-width: 920px;
+}
+
+dialog.modal-enterprise::backdrop {
+  background: rgba(6, 41, 18, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.modal-enterprise-inner {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.modal-enterprise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.35rem 1.5rem;
+  border-bottom: 1px solid var(--agro-border);
+}
+
+.modal-enterprise-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--agro-primary);
+}
+
+.modal-enterprise-header p {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  color: var(--agro-muted);
+  line-height: 1.45;
+  max-width: 36rem;
+}
+
+.modal-close-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: var(--agro-surface);
+  color: var(--agro-muted);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.modal-close-btn:hover {
+  background: #e8efe9;
+  color: var(--agro-primary);
+}
+
+.modal-enterprise-body {
+  padding: 1.35rem 1.5rem;
+}
+
+.modal-enterprise-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  padding: 1rem 1.5rem;
+  background: #eef6fc;
+  border-top: 1px solid #d4e8f5;
+}
+
+.form-field {
+  margin-bottom: 1.1rem;
+}
+
+.form-field .form-label {
+  margin-bottom: 0.4rem;
+  color: #334155;
+}
+
+.form-hint {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--agro-muted);
+  margin-top: 0.3rem;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.form-grid-product {
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 768px) {
+  .form-grid-product {
+    grid-template-columns: 1fr;
+  }
+  .form-row-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-checks-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.form-check-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+
+.form-check-pill input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--agro-primary);
+}
+
+.toggle-active-box {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  background: #f8faf9;
+  border: 1px solid var(--agro-border);
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.toggle-active-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-active-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #dcfce7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.toggle-active-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.toggle-active-text strong {
+  font-size: 0.92rem;
+  color: var(--agro-primary);
+}
+
+.toggle-active-text small {
+  font-size: 0.8rem;
+  color: var(--agro-muted);
+}
+
+.toggle-active-switch {
+  width: 48px;
+  height: 26px;
+  border-radius: 999px;
+  background: #cbd5e1;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.toggle-active-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+}
+
+.toggle-active-input:checked ~ .toggle-active-switch {
+  background: var(--agro-primary);
+}
+
+.toggle-active-input:checked ~ .toggle-active-switch::after {
+  transform: translateX(22px);
+}
+
+.image-preview-box {
+  margin-top: 0.65rem;
+  min-height: 200px;
+  border: 2px dashed #b8c9be;
+  border-radius: 12px;
+  background: #eef6fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-preview-box--filled {
+  border-style: solid;
+  border-color: var(--agro-border);
+  background: #fff;
+}
+
+.image-preview-placeholder {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--agro-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.image-preview-icon {
+  font-size: 2.5rem;
+  opacity: 0.5;
+}
+
+.image-preview-placeholder strong {
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.image-preview-placeholder span {
+  font-size: 0.82rem;
+}
+
+.image-preview-img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon .form-control {
+  padding-right: 2.75rem;
+}
+
+.input-icon-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.input-icon-btn:hover {
+  opacity: 1;
+}
+
+.page-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: var(--agro-card);
+  border: 1px solid var(--agro-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.page-toolbar h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--agro-primary);
+}
+
+.page-toolbar p {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: var(--agro-muted);
+}
+
+.product-thumb {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--agro-border);
+  background: #f8faf9;
+}
+
+.product-thumb-empty {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: #eef6fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  opacity: 0.5;
 }
 
 @media (max-width: 960px) {

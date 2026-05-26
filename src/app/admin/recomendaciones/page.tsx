@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { AdminShell } from "@/components/AdminShell";
 import { ConfirmDeleteButton } from "@/components/ConfirmDeleteButton";
-import { Dialog, DialogTrigger } from "@/components/DialogForm";
+import {
+  DialogTrigger,
+  EnterpriseDialog,
+  ModalActions,
+  ModalBody,
+  ModalFooter
+} from "@/components/EnterpriseDialog";
+import { RecomendacionFormFields } from "@/components/forms/RecomendacionForm";
 import { MlPredictorCard } from "@/components/MlPredictorCard";
 import { getAdminPageUser } from "@/lib/admin-page";
 import { getSupabaseAdmin } from "@/lib/supabase";
@@ -57,7 +64,13 @@ export default async function RecomendacionesPage({
     >
       <MlPredictorCard />
 
-      <p className="small text-muted mb-2">Reglas manuales en base de datos (filtrar / editar):</p>
+      <div className="page-toolbar">
+        <div>
+          <h2>Matriz de recomendaciones</h2>
+          <p>{rows.length} reglas activas en base de datos</p>
+        </div>
+        <DialogTrigger label="+ Nueva recomendación" dialogId="modal-create-rec" className="btn btn-agro" />
+      </div>
 
       <form method="get" className="row g-2 mb-3 align-items-end">
         <div className="col-auto">
@@ -87,9 +100,6 @@ export default async function RecomendacionesPage({
             Limpiar
           </Link>
         </div>
-        <div className="col-auto ms-auto">
-          <DialogTrigger label="+ Nueva" dialogId="modal-create-rec" className="btn btn-agro btn-sm" />
-        </div>
       </form>
 
       <div className="table-card">
@@ -101,25 +111,29 @@ export default async function RecomendacionesPage({
               <th>Meses</th>
               <th>Prob.</th>
               <th>Notas</th>
-              <th>Activo</th>
+              <th>Estado</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
               <tr key={String(r.id)}>
-                <td>{String(r.cultivo)}</td>
+                <td>
+                  <strong>{String(r.cultivo)}</strong>
+                </td>
                 <td>
                   {Number(r.altitud_min_m)} – {Number(r.altitud_max_m)} m
                 </td>
                 <td>
                   {MESES[Number(r.mes_inicio)] ?? r.mes_inicio} – {MESES[Number(r.mes_fin)] ?? r.mes_fin}
                 </td>
-                <td>{Number(r.probabilidad)}%</td>
-                <td className="small">{String(r.notas ?? "")}</td>
-                <td>{r.activo ? "✓" : "—"}</td>
                 <td>
-                  <DialogTrigger label="Editar" dialogId={`edit-rec-${r.id}`} />
+                  <span className="badge bg-success">{Number(r.probabilidad)}%</span>
+                </td>
+                <td className="small">{String(r.notas ?? "—")}</td>
+                <td>{r.activo ? <span className="badge bg-success">Activo</span> : "—"}</td>
+                <td>
+                  <DialogTrigger label="Editar" dialogId={`edit-rec-${r.id}`} className="btn btn-sm btn-outline-primary" />
                   <form action={deleteRecomendacion} className="d-inline" style={{ marginLeft: 4 }}>
                     <input type="hidden" name="id" value={String(r.id)} />
                     <ConfirmDeleteButton />
@@ -131,75 +145,49 @@ export default async function RecomendacionesPage({
         </table>
       </div>
 
-      <Dialog id="modal-create-rec" title="Nueva recomendación">
+      <EnterpriseDialog
+        id="modal-create-rec"
+        title="Nueva recomendación"
+        subtitle="Genera guías técnicas basadas en altitud, mes de siembra y probabilidad de éxito."
+      >
         <form action={createRecomendacion}>
-          <div className="modal-body">
-            <input className="form-control mb-2" name="cultivo" placeholder="Cultivo" required />
-            <div className="row mb-2">
-              <div className="col">
-                <input className="form-control" name="altitud_min_m" type="number" placeholder="Alt min" defaultValue={0} />
-              </div>
-              <div className="col">
-                <input className="form-control" name="altitud_max_m" type="number" placeholder="Alt max" defaultValue={5000} />
-              </div>
-            </div>
-            <div className="row mb-2">
-              <div className="col">
-                <input className="form-control" name="mes_inicio" type="number" min={1} max={12} placeholder="Mes inicio" required />
-              </div>
-              <div className="col">
-                <input className="form-control" name="mes_fin" type="number" min={1} max={12} placeholder="Mes fin" required />
-              </div>
-            </div>
-            <input className="form-control mb-2" name="probabilidad" type="number" step="0.01" defaultValue={80} />
-            <textarea className="form-control mb-2" name="notas" rows={2} />
-            <label className="form-check">
-              <input type="checkbox" name="activo" defaultChecked /> Activo
-            </label>
-          </div>
-          <div className="modal-footer">
-            <button type="submit" className="btn btn-agro">
-              Crear
-            </button>
-          </div>
+          <ModalBody>
+            <RecomendacionFormFields />
+          </ModalBody>
+          <ModalFooter>
+            <ModalActions dialogId="modal-create-rec" submitLabel="Crear recomendación" />
+          </ModalFooter>
         </form>
-      </Dialog>
+      </EnterpriseDialog>
 
       {rows.map((r) => (
-        <Dialog key={String(r.id)} id={`edit-rec-${r.id}`} title="Editar recomendación">
+        <EnterpriseDialog
+          key={String(r.id)}
+          id={`edit-rec-${r.id}`}
+          title="Editar recomendación"
+          subtitle={String(r.cultivo)}
+        >
           <form action={updateRecomendacion}>
             <input type="hidden" name="id" value={String(r.id)} />
-            <div className="modal-body">
-              <input className="form-control mb-2" name="cultivo" defaultValue={String(r.cultivo)} required />
-              <div className="row mb-2">
-                <div className="col">
-                  <input className="form-control" name="altitud_min_m" type="number" defaultValue={Number(r.altitud_min_m)} />
-                </div>
-                <div className="col">
-                  <input className="form-control" name="altitud_max_m" type="number" defaultValue={Number(r.altitud_max_m)} />
-                </div>
-              </div>
-              <div className="row mb-2">
-                <div className="col">
-                  <input className="form-control" name="mes_inicio" type="number" defaultValue={Number(r.mes_inicio)} />
-                </div>
-                <div className="col">
-                  <input className="form-control" name="mes_fin" type="number" defaultValue={Number(r.mes_fin)} />
-                </div>
-              </div>
-              <input className="form-control mb-2" name="probabilidad" type="number" defaultValue={Number(r.probabilidad)} />
-              <textarea className="form-control mb-2" name="notas" rows={2} defaultValue={String(r.notas ?? "")} />
-              <label className="form-check">
-                <input type="checkbox" name="activo" defaultChecked={!!r.activo} /> Activo
-              </label>
-            </div>
-            <div className="modal-footer">
-              <button type="submit" className="btn btn-agro">
-                Guardar
-              </button>
-            </div>
+            <ModalBody>
+              <RecomendacionFormFields
+                defaultValues={{
+                  cultivo: String(r.cultivo),
+                  altitud_min_m: Number(r.altitud_min_m),
+                  altitud_max_m: Number(r.altitud_max_m),
+                  mes_inicio: Number(r.mes_inicio),
+                  mes_fin: Number(r.mes_fin),
+                  probabilidad: Number(r.probabilidad),
+                  notas: String(r.notas ?? ""),
+                  activo: !!r.activo
+                }}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <ModalActions dialogId={`edit-rec-${r.id}`} submitLabel="Guardar cambios" />
+            </ModalFooter>
           </form>
-        </Dialog>
+        </EnterpriseDialog>
       ))}
     </AdminShell>
   );
