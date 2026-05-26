@@ -75,6 +75,7 @@ Abre [http://localhost:3000](http://localhost:3000).
 | GET | `/api/tablas_datos` | — |
 | GET | `/api/productos` | — |
 | GET | `/api/recomendaciones?altitud=&mes=` | — |
+| POST | `/api/recomendaciones/predict` | — (body: lat, lng, altitud, mes, clima) |
 | GET | `/api/alertas` | — |
 | POST | `/api/diagnostico` | Bearer |
 | GET/PUT | `/api/perfil` | Bearer |

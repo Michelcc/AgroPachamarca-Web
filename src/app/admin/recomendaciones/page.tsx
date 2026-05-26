@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AdminShell } from "@/components/AdminShell";
 import { ConfirmDeleteButton } from "@/components/ConfirmDeleteButton";
 import { Dialog, DialogTrigger } from "@/components/DialogForm";
+import { MlPredictorCard } from "@/components/MlPredictorCard";
 import { getAdminPageUser } from "@/lib/admin-page";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { createRecomendacion, updateRecomendacion, deleteRecomendacion } from "./actions";
@@ -50,6 +51,10 @@ export default async function RecomendacionesPage({
 
   return (
     <AdminShell user={user} title="Recomendaciones de cultivo">
+      <MlPredictorCard />
+
+      <p className="small text-muted mb-2">Reglas manuales en base de datos (filtrar / editar):</p>
+
       <form method="get" className="row g-2 mb-3 align-items-end">
         <div className="col-auto">
           <label className="form-label small">Altitud (msnm)</label>
