@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { normalizeImageUrl } from "@/lib/imageUrl";
 import { FormField } from "./FormField";
 
 export function ImageUrlPreview({
   name = "imagen_url",
   defaultValue = "",
-  label = "Image URL"
+  label = "URL de imagen"
 }: {
   name?: string;
   defaultValue?: string;
@@ -14,7 +15,8 @@ export function ImageUrlPreview({
 }) {
   const [url, setUrl] = useState(defaultValue);
   const [imgError, setImgError] = useState(false);
-  const valid = url.trim().length > 0 && !imgError;
+  const normalized = normalizeImageUrl(url);
+  const valid = !!normalized && !imgError;
 
   useEffect(() => {
     setImgError(false);
@@ -27,13 +29,18 @@ export function ImageUrlPreview({
         name={name}
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        placeholder="https://ejemplo.com/imagen.jpg"
+        placeholder="https://tu-proyecto.supabase.co/storage/v1/object/public/productos/foto.jpg"
       />
+      <p className="form-hint">
+        Debe ser una URL pública con <strong>https://</strong>. Sube el archivo en Supabase → Storage
+        (bucket <code>productos</code>) o usa un enlace directo a .jpg / .png / .webp. Ver{" "}
+        <code>sql/storage-productos.sql</code>.
+      </p>
       <div className={`image-preview-box${valid ? " image-preview-box--filled" : ""}`}>
         {valid ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={url}
+            src={normalized!}
             alt="Vista previa"
             onError={() => setImgError(true)}
             className="image-preview-img"

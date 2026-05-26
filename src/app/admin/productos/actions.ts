@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { resolveAppUserId } from "@/lib/admin-queries";
+import { normalizeImageUrl } from "@/lib/imageUrl";
 import { requireAdminSession } from "@/lib/session";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
@@ -18,18 +20,31 @@ function productPayload(formData: FormData) {
     stock: Number(formData.get("stock") || 0),
     disponible: formData.get("disponible") === "on",
     destacado: formData.get("destacado") === "on",
-    imagen_url: String(formData.get("imagen_url") || "").trim() || null
+    imagen_url: normalizeImageUrl(String(formData.get("imagen_url") || ""))
   };
+}
+
+function fail(path: string, message: string): never {
+  redirect(`${path}?error=${encodeURIComponent(message)}`);
 }
 
 export async function createProducto(formData: FormData) {
   await guard();
-  const userId = String(formData.get("user_id") || "");
-  if (!userId) throw new Error("Seleccione un usuario de la app.");
+  let userId: string;
+  try {
+    userId = await resolveAppUserId(String(formData.get("user_id") || ""));
+  } catch (e) {
+    fail(
+      "/admin/productos",
+      e instanceof Error ? e.message : "No hay usuario de app para asignar el producto"
+    );
+  }
+
   const { error } = await getSupabaseAdmin()
     .from("productos")
     .insert({ ...productPayload(formData), user_id: userId });
-  if (error) throw new Error(error.message);
+  if (error) fail("/admin/productos", error.message);
+
   revalidatePath("/admin/productos");
   redirect("/admin/productos?ok=created");
 }
@@ -40,7 +55,7 @@ export async function updateProducto(formData: FormData) {
     .from("productos")
     .update(productPayload(formData))
     .eq("id", String(formData.get("id")));
-  if (error) throw new Error(error.message);
+  if (error) fail("/admin/productos", error.message);
   revalidatePath("/admin/productos");
   redirect("/admin/productos?ok=updated");
 }
@@ -51,7 +66,7 @@ export async function deleteProducto(formData: FormData) {
     .from("productos")
     .delete()
     .eq("id", String(formData.get("id")));
-  if (error) throw new Error(error.message);
+  if (error) fail("/admin/productos", error.message);
   revalidatePath("/admin/productos");
   redirect("/admin/productos?ok=deleted");
 }

@@ -39,9 +39,12 @@ export function ProductFormFields({
     <div className="form-grid form-grid-product">
       <div className="form-grid-col">
         {showUserSelect ? (
-          <FormField label="Usuario app (propietario)">
-            <select className="form-select" name="user_id" defaultValue={dv.user_id ?? ""} required>
-              <option value="">Seleccionar usuario…</option>
+          <FormField
+            label="Usuario app (opcional)"
+            hint="Si no eliges uno, se asigna al primer usuario de la app móvil."
+          >
+            <select className="form-select" name="user_id" defaultValue={dv.user_id ?? ""}>
+              <option value="">Asignar automáticamente…</option>
               {profiles.map((pr) => (
                 <option key={pr.id} value={pr.id}>
                   {pr.nombre ?? pr.username}
@@ -117,7 +120,7 @@ export function ProductFormFields({
         </div>
       </div>
       <div className="form-grid-col">
-        <ImageUrlPreview defaultValue={dv.imagen_url ?? ""} label="Image URL" />
+        <ImageUrlPreview defaultValue={dv.imagen_url ?? ""} />
       </div>
     </div>
   );

@@ -22,10 +22,16 @@ function payload(formData: FormData) {
   };
 }
 
+function fail(path: string, message: string): never {
+  redirect(`${path}?error=${encodeURIComponent(message)}`);
+}
+
 export async function createRecomendacion(formData: FormData) {
   await guard();
-  const { error } = await getSupabaseAdmin().from("recomendaciones_cultivo").insert(payload(formData));
-  if (error) throw new Error(error.message);
+  const p = payload(formData);
+  if (!p.cultivo) fail("/admin/recomendaciones", "Seleccione un cultivo.");
+  const { error } = await getSupabaseAdmin().from("recomendaciones_cultivo").insert(p);
+  if (error) fail("/admin/recomendaciones", error.message);
   revalidatePath("/admin/recomendaciones");
   redirect("/admin/recomendaciones?ok=created");
 }

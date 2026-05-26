@@ -1,5 +1,6 @@
 import { AdminShell } from "@/components/AdminShell";
 import { ConfirmDeleteButton } from "@/components/ConfirmDeleteButton";
+import { EmptyTable } from "@/components/EmptyTable";
 import {
   DialogTrigger,
   EnterpriseDialog,
@@ -7,80 +8,126 @@ import {
   ModalBody,
   ModalFooter
 } from "@/components/EnterpriseDialog";
+import { PageFlash } from "@/components/PageFlash";
+import { ProductThumb } from "@/components/ProductThumb";
 import { ProductFormFields } from "@/components/forms/ProductForm";
 import { getAdminPageUser } from "@/lib/admin-page";
-import { getSupabaseAdmin } from "@/lib/supabase";
+import { fetchProductos, fetchProfiles } from "@/lib/admin-queries";
 import { createProducto, updateProducto, deleteProducto } from "./actions";
 
-export default async function ProductosPage() {
+export default async function ProductosPage({
+  searchParams
+}: {
+  searchParams: Promise<{ ok?: string; error?: string }>;
+}) {
   const user = await getAdminPageUser();
-  const db = getSupabaseAdmin();
-  const [{ data: productos }, { data: profiles }] = await Promise.all([
-    db
-      .from("productos")
-      .select("*,profiles(nombre,username)")
-      .order("created_at", { ascending: false })
-      .limit(500),
-    db.from("profiles").select("id,nombre,username").order("nombre").limit(200)
-  ]);
+  const sp = await searchParams;
+  const [{ data: productos, error: errProductos }, { data: profiles, error: errProfiles }] =
+    await Promise.all([fetchProductos(), fetchProfiles()]);
 
-  const profileOpts = (profiles ?? []).map((pr) => ({
+  const profileOpts = profiles.map((pr) => ({
     id: pr.id,
     nombre: pr.nombre,
     username: pr.username
   }));
 
+  const activos = productos.filter((p) => p.disponible).length;
+  const stockBajo = productos.filter((p) => Number(p.stock) <= 15).length;
+
   return (
     <AdminShell
       user={user}
       title="Gestión de productos"
-      subtitle="Catálogo e inventario agrícola con imágenes."
+      subtitle="Catálogo en tabla productos (Supabase) — visible en la app móvil."
     >
+      <PageFlash ok={sp.ok} error={sp.error} />
+
+      {errProductos ? (
+        <div className="alert alert-danger">
+          No se pudieron cargar productos: {errProductos}. Verifica que exista la tabla{" "}
+          <code>productos</code> en Supabase.
+        </div>
+      ) : null}
+      {errProfiles ? (
+        <div className="alert alert-warning">
+          Perfiles app: {errProfiles}. Ejecuta <code>sql/schema.sql</code> y{" "}
+          <code>sync-profiles-from-auth.sql</code>.
+        </div>
+      ) : null}
+
+      <div className="row g-3 mb-3">
+        <div className="col-md-4">
+          <div className="card stat-card p-3">
+            <div className="stat-label">Total productos</div>
+            <div className="stat-value">{productos.length}</div>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="card stat-card p-3">
+            <div className="stat-label">Disponibles</div>
+            <div className="stat-value">{activos}</div>
+            <div className="stat-trend">
+              {productos.length
+                ? `${((activos / productos.length) * 100).toFixed(0)}% del catálogo`
+                : "—"}
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="card stat-card p-3">
+            <div className="stat-label">Stock bajo</div>
+            <div className="stat-value">{stockBajo}</div>
+          </div>
+        </div>
+      </div>
+
       <div className="page-toolbar">
         <div>
           <h2>Inventario general</h2>
-          <p>{(productos ?? []).length} productos en el catálogo</p>
+          <p>Datos desde <code>public.productos</code></p>
         </div>
         <DialogTrigger label="+ Nuevo producto" dialogId="modal-create-prod" className="btn btn-agro" />
       </div>
 
       <div className="table-card">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Imagen</th>
-              <th>Producto</th>
-              <th>Categoría</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Usuario</th>
-              <th>Estado</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {(productos ?? []).map((p) => {
-              const prof = p.profiles as { nombre?: string; username?: string } | null;
-              return (
+        {productos.length === 0 ? (
+          <EmptyTable
+            emoji="📦"
+            title="Sin productos en la base de datos"
+            message="Crea el primero con «+ Nuevo producto». Si ya guardaste y no aparece, revisa SUPABASE_SERVICE_ROLE_KEY en Vercel."
+          />
+        ) : (
+          <table className="table table-hover-lite">
+            <thead>
+              <tr>
+                <th>Imagen</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Usuario</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {productos.map((p) => (
                 <tr key={p.id}>
                   <td>
-                    {p.imagen_url ? (
-                      <img src={p.imagen_url} alt="" className="product-thumb" />
-                    ) : (
-                      <div className="product-thumb-empty">📦</div>
-                    )}
+                    <ProductThumb url={p.imagen_url} alt={p.nombre} />
                   </td>
                   <td>
                     <strong>{p.nombre}</strong>
                     {p.destacado ? (
-                      <span className="badge bg-warning" style={{ marginLeft: 6 }}>
-                        Destacado
-                      </span>
+                      <span className="badge badge-featured">Destacado</span>
                     ) : null}
                   </td>
-                  <td>{p.categoria}</td>
                   <td>
-                    S/ {Number(p.precio).toFixed(2)} <span className="text-muted small">/ {p.unidad}</span>
+                    <span className="badge badge-cat">{p.categoria}</span>
+                  </td>
+                  <td>
+                    S/ {Number(p.precio).toFixed(2)}{" "}
+                    <span className="text-muted small">/ {p.unidad}</span>
                   </td>
                   <td>
                     {Number(p.stock) <= 15 ? (
@@ -89,7 +136,11 @@ export default async function ProductosPage() {
                       `${p.stock} uds`
                     )}
                   </td>
-                  <td>{prof?.nombre ?? prof?.username ?? String(p.user_id).slice(0, 8)}</td>
+                  <td className="small">
+                    {p.profile?.nombre ?? p.profile?.username ?? (
+                      <span className="text-muted">{String(p.user_id).slice(0, 8)}…</span>
+                    )}
+                  </td>
                   <td>
                     {p.disponible ? (
                       <span className="badge bg-success">Activo</span>
@@ -98,17 +149,21 @@ export default async function ProductosPage() {
                     )}
                   </td>
                   <td className="text-nowrap">
-                    <DialogTrigger label="Editar" dialogId={`edit-prod-${p.id}`} className="btn btn-sm btn-outline-primary" />
+                    <DialogTrigger
+                      label="Editar"
+                      dialogId={`edit-prod-${p.id}`}
+                      className="btn btn-sm btn-outline-primary"
+                    />
                     <form action={deleteProducto} className="d-inline" style={{ marginLeft: 4 }}>
                       <input type="hidden" name="id" value={p.id} />
                       <ConfirmDeleteButton />
                     </form>
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       <EnterpriseDialog
@@ -127,12 +182,12 @@ export default async function ProductosPage() {
         </form>
       </EnterpriseDialog>
 
-      {(productos ?? []).map((p) => (
+      {productos.map((p) => (
         <EnterpriseDialog
           key={p.id}
           id={`edit-prod-${p.id}`}
           title="Editar producto"
-          subtitle={String(p.nombre)}
+          subtitle={p.nombre}
           size="lg"
         >
           <form action={updateProducto}>

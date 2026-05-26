@@ -22,10 +22,14 @@ function payload(formData: FormData) {
   };
 }
 
+function fail(path: string, message: string): never {
+  redirect(`${path}?error=${encodeURIComponent(message)}`);
+}
+
 export async function createAlerta(formData: FormData) {
   await guard();
   const { error } = await getSupabaseAdmin().from("alertas_climaticas").insert(payload(formData));
-  if (error) throw new Error(error.message);
+  if (error) fail("/admin/alertas", error.message);
   revalidatePath("/admin/alertas");
   redirect("/admin/alertas?ok=created");
 }

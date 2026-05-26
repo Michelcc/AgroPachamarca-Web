@@ -1449,6 +1449,131 @@ dialog.modal-enterprise::backdrop {
   opacity: 0.5;
 }
 
+.page-flash {
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  border: none;
+  box-shadow: var(--shadow);
+}
+
+.empty-table {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--agro-muted);
+}
+
+.empty-table-emoji {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.empty-table strong {
+  display: block;
+  color: var(--agro-primary);
+  font-size: 1.05rem;
+  margin-bottom: 0.35rem;
+}
+
+.empty-table p {
+  margin: 0;
+  font-size: 0.9rem;
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--agro-card);
+  border: 1px solid var(--agro-border);
+  border-radius: var(--radius);
+}
+
+.filter-bar-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--agro-muted);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-cat {
+  background: #e8f5ec;
+  color: var(--agro-primary);
+  font-weight: 600;
+}
+
+.badge-featured {
+  margin-left: 0.35rem;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.7rem;
+}
+
+.table-excerpt {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prob-gauge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prob-gauge-track {
+  flex: 1;
+  height: 8px;
+  background: #e8eeea;
+  border-radius: 999px;
+  overflow: hidden;
+  min-width: 64px;
+}
+
+.prob-gauge-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.prob-gauge--low .prob-gauge-fill {
+  background: linear-gradient(90deg, #f97316, #fb923c);
+}
+
+.prob-gauge--mid .prob-gauge-fill {
+  background: linear-gradient(90deg, #eab308, #facc15);
+}
+
+.prob-gauge--high .prob-gauge-fill {
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+}
+
+.prob-gauge-label {
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: var(--agro-primary);
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+.prob-gauge--lg .prob-gauge-track {
+  height: 12px;
+}
+
+.prob-gauge--lg .prob-gauge-label {
+  font-size: 1.25rem;
+  min-width: 3rem;
+}
+
 @media (max-width: 960px) {
   .login-split {
     grid-template-columns: 1fr;
