@@ -34,7 +34,11 @@ export default async function DiagnosticosPage({
   const diasOrdenados = Object.entries(statsPorDia).sort((a, b) => b[0].localeCompare(a[0]));
 
   return (
-    <AdminShell user={user} title="Diagnósticos IA">
+    <AdminShell
+      user={user}
+      title="Diagnósticos IA"
+      subtitle="Registro de análisis de plantas y tendencia de salud."
+    >
       <form method="get" className="row g-2 mb-3 align-items-end">
         <div className="col-auto">
           <label className="form-label small">Filtrar por fecha</label>

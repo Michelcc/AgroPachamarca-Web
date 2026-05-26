@@ -50,7 +50,11 @@ export default async function RecomendacionesPage({
   const rows = filterRows(all ?? [], filtroAlt, filtroMes);
 
   return (
-    <AdminShell user={user} title="Recomendaciones de cultivo">
+    <AdminShell
+      user={user}
+      title="Recomendaciones de cultivo"
+      subtitle="Optimiza decisiones con ML, altitud y estacionalidad."
+    >
       <MlPredictorCard />
 
       <p className="small text-muted mb-2">Reglas manuales en base de datos (filtrar / editar):</p>

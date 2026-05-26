@@ -20,7 +20,11 @@ export default async function TablasPage() {
     .order("codigo");
 
   return (
-    <AdminShell user={user} title="Tablas de datos">
+    <AdminShell
+      user={user}
+      title="Tablas de datos"
+      subtitle="Catálogo de esquemas de campo del sistema."
+    >
       <div className="d-flex justify-content-between mb-3">
         <p className="text-muted mb-0">
           Catálogo de tablas de campo para la app móvil ({(tablas ?? []).length} registros)

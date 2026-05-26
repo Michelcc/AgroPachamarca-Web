@@ -7,6 +7,7 @@ export function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [remember, setRemember] = useState(true);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,18 +41,45 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} className="login-form">
       {error ? <div className="alert alert-danger">{error}</div> : null}
       <div className="mb-3">
-        <label className="form-label">Correo</label>
-        <input type="email" name="email" className="form-control" required />
+        <label className="form-label">Corporate Email</label>
+        <input
+          type="email"
+          name="email"
+          className="form-control"
+          placeholder="nombre@agroempresa.com"
+          required
+          autoComplete="email"
+        />
       </div>
-      <div className="mb-4">
-        <label className="form-label">Contraseña</label>
-        <input type="password" name="password" className="form-control" required />
+      <div className="mb-3">
+        <label className="form-label">Password</label>
+        <input
+          type="password"
+          name="password"
+          className="form-control"
+          placeholder="••••••••"
+          required
+          autoComplete="current-password"
+        />
       </div>
-      <button type="submit" className="btn btn-agro w-100" disabled={loading}>
-        {loading ? "Entrando…" : "Entrar"}
+      <div className="login-form-row mb-4">
+        <label className="form-check">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+          />
+          Remember me
+        </label>
+        <a href="#" className="login-forgot" onClick={(e) => e.preventDefault()}>
+          Forgot password?
+        </a>
+      </div>
+      <button type="submit" className="btn btn-agro btn-login w-100" disabled={loading}>
+        {loading ? "Accediendo…" : "Acceder al Panel"}
       </button>
     </form>
   );

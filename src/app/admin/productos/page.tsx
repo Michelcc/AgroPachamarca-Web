@@ -18,7 +18,11 @@ export default async function ProductosPage() {
   ]);
 
   return (
-    <AdminShell user={user} title="Productos">
+    <AdminShell
+      user={user}
+      title="Gestión de productos"
+      subtitle="Catálogo e inventario agrícola."
+    >
       <div className="d-flex justify-content-between mb-3">
         <p className="text-muted mb-0">Todos los productos de la app móvil</p>
         <DialogTrigger label="+ Nuevo producto" dialogId="modal-create-prod" />

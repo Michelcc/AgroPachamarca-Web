@@ -43,7 +43,11 @@ export default async function UsuariosPage({
             : null;
 
   return (
-    <AdminShell user={user} title="Usuarios">
+    <AdminShell
+      user={user}
+      title="Gestión de usuarios"
+      subtitle="Panel web y perfiles de la app móvil."
+    >
       {okMsg ? <div className="alert alert-success">{okMsg}</div> : null}
       {errUsuarios ? (
         <div className="alert alert-warning">Panel: {errUsuarios.message}</div>

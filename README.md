@@ -77,9 +77,10 @@ Abre [http://localhost:3000](http://localhost:3000).
 | GET | `/api/recomendaciones?altitud=&mes=` | — |
 | POST | `/api/recomendaciones/predict` | — (body: lat, lng, altitud, mes, clima) |
 | GET | `/api/alertas` | — |
+| POST | `/api/alertas/predict` | — (body: lat, lng, altitud, temp, prob. lluvia) |
 | POST | `/api/diagnostico` | Bearer |
 | GET/PUT | `/api/perfil` | Bearer |
-| POST | `/api/registros_gps` | Bearer |
+| POST | `/api/registros_gps` | Bearer (solo app móvil) |
 
 ## Panel admin
 

@@ -1,6 +1,7 @@
 import { AdminShell } from "@/components/AdminShell";
 import { ConfirmDeleteButton } from "@/components/ConfirmDeleteButton";
 import { Dialog, DialogTrigger } from "@/components/DialogForm";
+import { MlAlertPredictorCard } from "@/components/MlAlertPredictorCard";
 import { getAdminPageUser } from "@/lib/admin-page";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { createAlerta, updateAlerta, toggleAlerta, deleteAlerta } from "./actions";
@@ -25,9 +26,15 @@ export default async function AlertasPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <AdminShell user={user} title="Alertas climáticas">
+    <AdminShell
+      user={user}
+      title="Alertas climáticas"
+      subtitle="Monitoreo en tiempo real y evaluación ML de riesgos."
+    >
+      <MlAlertPredictorCard />
+
       <div className="d-flex justify-content-between mb-3">
-        <p className="text-muted mb-0">Alertas globales visibles en la app móvil</p>
+        <p className="text-muted mb-0">Alertas globales manuales (panel → app móvil)</p>
         <DialogTrigger label="+ Nueva alerta" dialogId="modal-create-alerta" />
       </div>
 

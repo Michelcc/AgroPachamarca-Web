@@ -1,56 +1,67 @@
-import Link from "next/link";
+import { AdminFooter } from "./AdminFooter";
+import { AdminNav } from "./AdminNav";
+import { LogoutButton } from "./LogoutButton";
 import type { SessionUser } from "@/lib/session";
-
-const MENU = [
-  { href: "/dashboard", label: "Dashboard", icon: "📊" },
-  { href: "/admin/usuarios", label: "Usuarios", icon: "👥" },
-  { href: "/admin/tablas", label: "Tablas de datos", icon: "📋" },
-  { href: "/admin/productos", label: "Productos", icon: "📦" },
-  { href: "/admin/recomendaciones", label: "Recomendaciones", icon: "🌾" },
-  { href: "/admin/alertas", label: "Alertas clima", icon: "☁️" },
-  { href: "/admin/diagnosticos", label: "Diagnósticos IA", icon: "🔬" },
-  { href: "/admin/registros-gps", label: "Registros GPS", icon: "📍" }
-];
 
 export function AdminShell({
   user,
   title,
+  subtitle,
   children
 }: {
   user: SessionUser;
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
 }) {
+  const initial = (user.nombre || user.email || "A").charAt(0).toUpperCase();
+
   return (
     <div className="admin-layout">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <span>🌿 Agro</span>
-          <small>Admin Panel</small>
+          <div className="sidebar-logo">🌿</div>
+          <div>
+            <strong>Agro System</strong>
+            <small>Gestión Empresarial</small>
+          </div>
         </div>
-        <nav>
-          {MENU.map((m) => (
-            <Link key={m.href} href={m.href} className="nav-link">
-              {m.icon} {m.label}
-            </Link>
-          ))}
-        </nav>
+        <AdminNav />
         <div className="sidebar-foot">
-          <div>{user.nombre}</div>
-          <small>{user.rol}</small>
-          <form action="/api/auth/logout" method="post">
-            <button type="submit" className="link-btn">
-              Cerrar sesión
-            </button>
-          </form>
+          <div className="sidebar-user">
+            <div className="sidebar-avatar">{initial}</div>
+            <div>
+              <div className="sidebar-user-name">{user.nombre}</div>
+              <small>{user.rol === "admin" ? "Super Administrador" : user.rol}</small>
+            </div>
+          </div>
+          <LogoutButton />
         </div>
       </aside>
+
       <div className="main">
         <header className="topbar">
-          <h1>{title}</h1>
-          <span className="badge">v1.0</span>
+          <div className="topbar-left">
+            <h1>{title}</h1>
+            {subtitle ? <p className="topbar-subtitle">{subtitle}</p> : null}
+          </div>
+          <div className="topbar-right">
+            <div className="topbar-search">
+              <span className="search-icon">⌕</span>
+              <input type="search" placeholder="Buscar en el panel…" aria-label="Buscar" />
+            </div>
+            <div className="topbar-user">
+              <div className="topbar-avatar">{initial}</div>
+              <div className="topbar-user-text">
+                <span className="topbar-user-name">{user.nombre}</span>
+                <span className="topbar-user-role">Admin Agrónomo</span>
+              </div>
+              <LogoutButton compact />
+            </div>
+          </div>
         </header>
         <main className="content">{children}</main>
+        <AdminFooter />
       </div>
     </div>
   );
