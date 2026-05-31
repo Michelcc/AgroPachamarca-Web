@@ -35,7 +35,7 @@ export async function createProducto(formData: FormData) {
     userId = await resolveAppUserId(String(formData.get("user_id") || ""));
   } catch (e) {
     fail(
-      "/admin/productos",
+      "/admin/tablas/productos",
       e instanceof Error ? e.message : "No hay usuario de app para asignar el producto"
     );
   }
@@ -43,10 +43,10 @@ export async function createProducto(formData: FormData) {
   const { error } = await getSupabaseAdmin()
     .from("productos")
     .insert({ ...productPayload(formData), user_id: userId });
-  if (error) fail("/admin/productos", error.message);
+  if (error) fail("/admin/tablas/productos", error.message);
 
-  revalidatePath("/admin/productos");
-  redirect("/admin/productos?ok=created");
+  revalidatePath("/admin/tablas/productos");
+  redirect("/admin/tablas/productos?ok=created");
 }
 
 export async function updateProducto(formData: FormData) {
@@ -55,9 +55,9 @@ export async function updateProducto(formData: FormData) {
     .from("productos")
     .update(productPayload(formData))
     .eq("id", String(formData.get("id")));
-  if (error) fail("/admin/productos", error.message);
-  revalidatePath("/admin/productos");
-  redirect("/admin/productos?ok=updated");
+  if (error) fail("/admin/tablas/productos", error.message);
+  revalidatePath("/admin/tablas/productos");
+  redirect("/admin/tablas/productos?ok=updated");
 }
 
 export async function deleteProducto(formData: FormData) {
@@ -66,7 +66,7 @@ export async function deleteProducto(formData: FormData) {
     .from("productos")
     .delete()
     .eq("id", String(formData.get("id")));
-  if (error) fail("/admin/productos", error.message);
-  revalidatePath("/admin/productos");
-  redirect("/admin/productos?ok=deleted");
+  if (error) fail("/admin/tablas/productos", error.message);
+  revalidatePath("/admin/tablas/productos");
+  redirect("/admin/tablas/productos?ok=deleted");
 }

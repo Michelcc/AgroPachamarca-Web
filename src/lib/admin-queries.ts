@@ -71,6 +71,45 @@ export async function fetchRecomendaciones() {
   return { data: data ?? [], error: error?.message ?? null };
 }
 
+export type IndicadorOpRow = {
+  id: string;
+  user_id: string;
+  variable_dependiente: string;
+  dimension_id: string;
+  dimension_label: string;
+  indicador_id: string;
+  indicador_label: string;
+  instrumento: string;
+  tipo_instrumento: string;
+  valor_numerico: number | null;
+  valor_texto: string | null;
+  unidad: string | null;
+  created_at: string;
+  profile?: ProfileRow | null;
+};
+
+export async function fetchIndicadoresOperacionales(): Promise<{
+  data: IndicadorOpRow[];
+  error: string | null;
+}> {
+  const db = getSupabaseAdmin();
+  const { data: rows, error } = await db
+    .from("indicadores_operacionalizacion")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(500);
+  if (error) return { data: [], error: error.message };
+  const { data: profiles } = await db.from("profiles").select("id,nombre,username").limit(500);
+  const map = new Map((profiles ?? []).map((p) => [p.id, p]));
+  return {
+    data: (rows ?? []).map((r) => ({
+      ...r,
+      profile: map.get(r.user_id) ?? null
+    })) as IndicadorOpRow[],
+    error: null
+  };
+}
+
 export async function resolveAppUserId(formUserId: string): Promise<string> {
   const trimmed = formUserId.trim();
   if (trimmed) return trimmed;
@@ -86,4 +125,40 @@ export async function resolveAppUserId(formUserId: string): Promise<string> {
     );
   }
   return data.id;
+}
+
+export type LecturaSensorRow = {
+  id: string;
+  user_id: string;
+  sensor_codigo: string | null;
+  humedad_pct: number | null;
+  ph: number | null;
+  temperatura_c: number | null;
+  conductividad_ms_cm: number | null;
+  profundidad_cm: number | null;
+  estado_suelo: string | null;
+  created_at: string;
+  profile?: ProfileRow | null;
+};
+
+export async function fetchLecturasSensorSuelo(): Promise<{
+  data: LecturaSensorRow[];
+  error: string | null;
+}> {
+  const db = getSupabaseAdmin();
+  const { data: rows, error } = await db
+    .from("lecturas_sensor_suelo")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(500);
+  if (error) return { data: [], error: error.message };
+  const { data: profiles } = await db.from("profiles").select("id,nombre,username").limit(500);
+  const map = new Map((profiles ?? []).map((p) => [p.id, p]));
+  return {
+    data: (rows ?? []).map((r) => ({
+      ...r,
+      profile: map.get(r.user_id) ?? null
+    })) as LecturaSensorRow[],
+    error: null
+  };
 }

@@ -14,9 +14,10 @@ export default async function DashboardPage() {
   let totalRecomendaciones = 0;
   let totalAlertas = 0;
   let totalDiagnosticos = 0;
+  let totalIndicadoresOp = 0;
 
   try {
-    const [u, t, p, r, a, d] = await Promise.all([
+    const [u, t, p, r, a, d, io] = await Promise.all([
       db.from("usuarios").select("id", { count: "exact", head: true }),
       db.from("catalogo_tablas").select("id", { count: "exact", head: true }).eq("activo", true),
       db.from("productos").select("id", { count: "exact", head: true }),
@@ -28,7 +29,8 @@ export default async function DashboardPage() {
         .from("alertas_climaticas")
         .select("id", { count: "exact", head: true })
         .eq("activo", true),
-      db.from("diagnosticos_ia").select("id", { count: "exact", head: true })
+      db.from("diagnosticos_ia").select("id", { count: "exact", head: true }),
+      db.from("indicadores_operacionalizacion").select("id", { count: "exact", head: true })
     ]);
 
     totalUsuarios = u.count ?? 0;
@@ -37,6 +39,7 @@ export default async function DashboardPage() {
     totalRecomendaciones = r.count ?? 0;
     totalAlertas = a.count ?? 0;
     totalDiagnosticos = d.count ?? 0;
+    totalIndicadoresOp = io.count ?? 0;
   } catch (e) {
     errorDash = e instanceof Error ? e.message : "Error de datos";
   }
@@ -44,9 +47,10 @@ export default async function DashboardPage() {
   const stats = [
     { label: "Tablas de campo activas", value: totalTablas, href: "/admin/tablas", trend: "Catálogo operativo" },
     { label: "Usuarios panel", value: totalUsuarios, href: "/admin/usuarios", trend: "Acceso administrativo" },
-    { label: "Productos", value: totalProductos, href: "/admin/productos", trend: "Inventario" },
+    { label: "Productos", value: totalProductos, href: "/admin/tablas/productos", trend: "Inventario" },
     { label: "Recomendaciones", value: totalRecomendaciones, href: "/admin/recomendaciones", trend: "ML cultivos" },
     { label: "Alertas clima", value: totalAlertas, href: "/admin/alertas", trend: "Monitoreo" },
+    { label: "Variables tesis", value: totalIndicadoresOp, href: "/admin/operacionalizacion", trend: "Operacionalización" },
     { label: "Diagnósticos IA", value: totalDiagnosticos, href: "/admin/diagnosticos", trend: "Visión IA" }
   ];
 
